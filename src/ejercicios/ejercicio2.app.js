@@ -22,8 +22,9 @@ function App() {
   const [valor, setValor] = useState("");
   const dispatch = useDispatch();
   const state = useSelector(state => state);
+
   const set = () => {
-    dispatch({type: "set", payload: valor})
+    dispatch({type: "set", payload: valor});
     setValor("");
   }
 
