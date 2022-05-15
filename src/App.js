@@ -1,37 +1,70 @@
 import './App.css';
 import { useState } from "react";
+import { combineReducers } from "redux";
 import { useDispatch, useSelector } from 'react-redux';
 
-export const reducer = (state = initialState, action) => {
-  switch(action.type){
-    case "todo/add": {
-      console.log("reducer");
-      return {
-        ...state,
-        entities: state.entities.concat({...action.payload})
-      }
-    }
-    case "todo/complete": {
-       const newTodos = state.entities.map(todo => {
-         if (todo.id === action.payload.id){
-           return {...todo, completed: !todo.completed}
-         }
-         return todo
-       })   
-       return {
-         ...state,
-         entities: newTodos
-       }  
-    }
-    case "filter/set": {
-      return {
-        ...state,
-        filter: action.payload        
-      }
-    }
+export const filterReducer = (state = "all", action) => {
+  switch (action.type) {
+    case "filter/set":
+      return action.payload;
+    default:
+      return state;
   }
-  return state;
 }
+
+export const todosReducer = (state = [], action) => {
+  switch (action.type) {
+    case "todo/add": 
+      return state.concat({ ...action.payload });      
+    case "todo/complete":
+      const newTodos = state.map(todo => {
+        if (todo.id === action.payload.id) {
+          return { ...todo, completed: !todo.completed };
+        }
+        return todo;
+      })
+      return newTodos;
+    default:
+      return state;
+  }
+}
+
+export const reducer = combineReducers({
+  entities: todosReducer, //propiedad del estado que debe mantener (entities), asignándole el reducer que va a utilizar para mantenerla (todosReducer)
+  filter: filterReducer,
+})
+
+
+// export const reducer = (state = initialState, action) => {
+//   switch(action.type){
+//     case "todo/add": {
+//       console.log("reducer");
+//       return {
+//         ...state,
+//         entities: state.entities.concat({...action.payload})
+//       }
+//     }
+//     case "todo/complete": {
+//        const newTodos = state.entities.map(todo => {
+//          if (todo.id === action.payload.id){
+//            return {...todo, completed: !todo.completed}
+//          }
+//          return todo
+//        })   
+//        return {
+//          ...state,
+//          entities: newTodos
+//        }  
+//     }
+//     case "filter/set": {
+//       return {
+//         ...state,
+//         filter: action.payload        
+//       }
+//     }
+//   }
+//   return state;
+// }
 
 const selectTodos = state => {
   const {entities, filter } = state;
@@ -41,11 +74,6 @@ const selectTodos = state => {
     return entities.filter(todo => !todo.completed);
   }
   return entities;
-}
-
-const initialState = {
-  entities: [],
-  filter: "all", //Le decimos que nos muestre todos los valores, solo los que estén completos o los que estén incompletos.
 }
 
 const TodoItem = ({todo}) => {
