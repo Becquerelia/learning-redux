@@ -23,12 +23,29 @@ export const reducer = (state = initialState, action) => {
          entities: newTodos
        }  
     }
+    case "filter/set": {
+      return {
+        ...state,
+        filter: action.payload        
+      }
+    }
   }
   return state;
 }
 
+const selectTodos = state => {
+  const {entities, filter } = state;
+  if (filter === "complete") {
+    return entities.filter(todo => todo.completed);
+  } else if (filter === "incomplete") {
+    return entities.filter(todo => !todo.completed);
+  }
+  return entities;
+}
+
 const initialState = {
-  entities: []
+  entities: [],
+  filter: "all", //Le decimos que nos muestre todos los valores, solo los que estén completos o los que estén incompletos.
 }
 
 const TodoItem = ({todo}) => {
@@ -42,7 +59,7 @@ function App() {
 
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
-  const state = useSelector(x => x);
+  const todos = useSelector(selectTodos);
   
 
   const submit = (e) => {
@@ -63,11 +80,11 @@ function App() {
       <form onSubmit={submit} >
         <input value={value} onChange={e => setValue(e.target.value)} />
       </form>
-      <button>Mostrar ToDOs</button>
-      <button>Completados</button>
-      <button>Incompletos</button>
+      <button onClick={()=> dispatch({type:"filter/set", payload: "all"})} >Mostrar ToDOs</button>
+      <button onClick={()=> dispatch({type:"filter/set", payload: "complete"})} >Completados</button>
+      <button onClick={()=> dispatch({type:"filter/set", payload: "incomplete"})} >Incompletos</button>
       <ul>
-        {state.entities.map(todo => <TodoItem key={todo.id} todo={todo} /> ) }
+        {todos.map(todo => <TodoItem key={todo.id} todo={todo} /> ) }
       </ul>
     </div>
   );
