@@ -3,6 +3,7 @@ import { useState } from "react";
 import { combineReducers } from "redux";
 import { useDispatch, useSelector } from 'react-redux';
 
+//! MIDDLEWARE FOR ASYNC BEHAVIOUR:
 export const asyncMiddleware = store => next => action => {
   if (typeof action === "function"){
     return action(store.dispatch, store.getState);
@@ -10,6 +11,7 @@ export const asyncMiddleware = store => next => action => {
   return next(action);
 }
 
+//! FUNCTION FOR GET DATA WITH FETCHING:
 export const fetchThunk = () => async dispatch => {
   dispatch ({type: "todos/pending"});
   try {
@@ -23,6 +25,7 @@ export const fetchThunk = () => async dispatch => {
   }
 }
 
+//! FILTER REDUCER:
 export const filterReducer = (state = "all", action) => {
   switch (action.type) {
     case "filter/set":
@@ -32,6 +35,26 @@ export const filterReducer = (state = "all", action) => {
   }
 }
 
+const initialFetching = {loading: "idle", error: null}
+
+//! FETCHING REDUCER:
+export const fetchingReducer = (state = initialFetching, action) => {
+  switch(action.type){
+    case "todos/pending": {
+      return { ...state, loading: "pending"};
+    }
+    case "todos/fulfilled": {
+      return { ...state, loading: "succeded"};
+    }
+    case "todos/error": {
+      return { error: action.error, loading: "rejected"};
+    }
+    default:
+      return state;
+  }
+} 
+
+//! "ToDOs" REDUCER:
 export const todosReducer = (state = [], action) => {
   switch (action.type) {
     case "todos/fulfilled":
@@ -51,13 +74,17 @@ export const todosReducer = (state = [], action) => {
   }
 }
 
+//!COMBINE REDUCERS:
 export const reducer = combineReducers({
-  entities: todosReducer, //propiedad del estado que debe mantener (entities), asignándole el reducer que va a utilizar para mantenerla (todosReducer)
+  todos: combineReducers({
+    entities: todosReducer, //propiedad del estado que debe mantener (entities), asignándole el reducer que va a utilizar para mantenerla (todosReducer)
+    status: fetchingReducer
+  }), 
   filter: filterReducer,
 })
 
 const selectTodos = state => {
-  const {entities, filter } = state;
+  const {todos: {entities}, filter } = state;
   if (filter === "complete") {
     return entities.filter(todo => todo.completed);
   } else if (filter === "incomplete") {
@@ -65,6 +92,8 @@ const selectTodos = state => {
   }
   return entities;
 }
+
+const selectStatus = state => state.todos.status;
 
 const TodoItem = ({todo}) => {
   const dispatch = useDispatch()
@@ -78,6 +107,7 @@ function App() {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
   const todos = useSelector(selectTodos);
+  const status = useSelector(selectStatus);
   
 
   const submit = (e) => {
@@ -91,7 +121,11 @@ function App() {
     setValue("");
   }
 
-  
+if(status.loading === "pending"){
+  return <p>Cargando...</p>  
+} else if (status.loading === "rejected"){
+  return <p>{status.error}</p> 
+}  
 
   return (
     <div >
