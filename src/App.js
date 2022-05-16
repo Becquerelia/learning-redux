@@ -11,17 +11,49 @@ export const asyncMiddleware = store => next => action => {
   return next(action);
 }
 
+//! "SET PENDING" FUNCTION:
+const setPending = () => {
+  return {
+    type: "todos/pending"
+  }
+}
+
+//! "SET FULLFILED" FUNCTION:
+const setFullfilled = (todos) => {
+  return {
+    type: "todos/fulfilled", 
+    payload: todos
+  }
+}
+
+//! "SET ERROR" FUNCTION:
+const setError = (e) => {
+  return {
+    type: "todos/error", 
+    error: e.message
+  }
+}
+
+//! "SET COMPLETE" FUNCTION:
+const setComplete= (todo) => {
+  return {
+    type: "todo/complete", 
+    payload: todo
+  }
+}
+
+
 //! FUNCTION FOR GET DATA WITH FETCHING:
 export const fetchThunk = () => async dispatch => {
-  dispatch ({type: "todos/pending"});
+  dispatch (setPending());
   try {
     const response = await fetch("https://jsonplaceholder.typicode.com/todos");
     const data = await response.json()
     const todos = data.slice(0, 10);
-    dispatch({ type: "todos/fulfilled", payload: todos })    
+    dispatch(setFullfilled(todos))    
   }
   catch (e) {
-    dispatch ({ type: "todos/error", error: e.message});
+    dispatch (setError(e));
   }
 }
 
@@ -98,7 +130,7 @@ const selectStatus = state => state.todos.status;
 const TodoItem = ({todo}) => {
   const dispatch = useDispatch()
   return (
-    <li style={{textDecoration: todo.completed ? "line-through" : "none" }} onClick={()=> dispatch({type: "todo/complete", payload: todo})} >{todo.title}</li>
+    <li style={{textDecoration: todo.completed ? "line-through" : "none" }} onClick={()=> dispatch(setComplete(todo))} >{todo.title}</li>
   )
 }
 
