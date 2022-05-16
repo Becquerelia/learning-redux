@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { makeFetchingReducer, makeSetReducer, reduceReducers} from "./utils";
+import { makeFetchingReducer, makeSetReducer, reduceReducers, makeCrudReducer } from "./utils";
 
 //! "SET PENDING" FUNCTION:
 const setPending = () => {
@@ -55,34 +55,19 @@ const setPending = () => {
 }
 
 //! FILTER REDUCER:
-const filterReducer = makeSetReducer(["filter/set"])
+const filterReducer = makeSetReducer(["filter/set"]);
   
 //! FETCHING REDUCER:
- const fetchingReducer = makeFetchingReducer(["todos/pending", "todos/fulfilled", "todos/rejected"])
-
-//! PROVISIONAL:
-const reducerProvisional = (state = [], action) => {
-    switch (action.type) {      
-      case "todo/add": 
-        return state.concat({ ...action.payload });      
-      case "todo/complete":
-        const newTodos = state.map(todo => {
-          if (todo.id === action.payload.id) {
-            return { ...todo, completed: !todo.completed };
-          }
-          return todo;
-        })
-        return newTodos;
-      default:
-        return state;
-    }
-  }
+ const fetchingReducer = makeFetchingReducer(["todos/pending", "todos/fulfilled", "todos/rejected"]);
 
  //! FULFILLED REDUCER:
- const fulfilledReducer = makeSetReducer(["todos/fulfilled"])
+ const fulfilledReducer = makeSetReducer(["todos/fulfilled"]);
 
-  //! "ToDOs" REDUCER:
-  const todosReducer = reduceReducers(reducerProvisional, fulfilledReducer);
+ //! CRUD REDUCER:
+ const crudReducer = makeCrudReducer(["todo/add", "todo/complete"]);
+
+ //! "ToDOs" REDUCER:
+ const todosReducer = reduceReducers(crudReducer, fulfilledReducer);
     
   //!COMBINE REDUCERS:
   const reducer = combineReducers({
@@ -120,5 +105,5 @@ const reducerProvisional = (state = [], action) => {
       reducer,
       selectTodos,
       selectStatus,
-      reducerProvisional 
+      crudReducer 
     }
