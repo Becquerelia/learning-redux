@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { makeFetchingReducer, makeSetReducer} from "./utils";
+import { makeFetchingReducer, makeSetReducer, reduceReducers} from "./utils";
 
 //! "SET PENDING" FUNCTION:
 const setPending = () => {
@@ -60,11 +60,9 @@ const filterReducer = makeSetReducer(["filter/set"])
 //! FETCHING REDUCER:
  const fetchingReducer = makeFetchingReducer(["todos/pending", "todos/fulfilled", "todos/rejected"])
 
-  //! "ToDOs" REDUCER:
-  const todosReducer = (state = [], action) => {
-    switch (action.type) {
-      case "todos/fulfilled":
-        return action.payload;
+//! PROVISIONAL:
+const reducerProvisional = (state = [], action) => {
+    switch (action.type) {      
       case "todo/add": 
         return state.concat({ ...action.payload });      
       case "todo/complete":
@@ -79,7 +77,13 @@ const filterReducer = makeSetReducer(["filter/set"])
         return state;
     }
   }
-  
+
+ //! FULFILLED REDUCER:
+ const fulfilledReducer = makeSetReducer(["todos/fulfilled"])
+
+  //! "ToDOs" REDUCER:
+  const todosReducer = reduceReducers(reducerProvisional, fulfilledReducer);
+    
   //!COMBINE REDUCERS:
   const reducer = combineReducers({
     todos: combineReducers({
@@ -115,5 +119,6 @@ const filterReducer = makeSetReducer(["filter/set"])
       todosReducer, 
       reducer,
       selectTodos,
-      selectStatus 
+      selectStatus,
+      reducerProvisional 
     }

@@ -1,4 +1,9 @@
 const initialFetching = {loading: "idle", error: null}
+
+//! REDUCE REDUCERS:
+const reduceReducers = (...reducers) => (state, action) =>
+    reducers.reduce((acc, el)=> el(acc, action), state)
+
   
   //! HIGH ORDER REDUCER:
   const makeFetchingReducer = actions => (state = initialFetching, action) => {
@@ -27,4 +32,4 @@ const makeSetReducer  = actions => (state = "all", action) => {
     }
   }
 
-export {makeFetchingReducer, makeSetReducer }
+export {makeFetchingReducer, makeSetReducer, reduceReducers }
