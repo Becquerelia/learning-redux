@@ -3,7 +3,9 @@ import ReactDOM from "react-dom/client";
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import "./index.css";
-import App, { reducer, asyncMiddleware } from "./App"; //Ponemos aquí el reducer solo para ver un ejemplo, pero NO es una buena práctica
+import App from "./App"; //Ponemos aquí el reducer solo para ver un ejemplo, pero NO es una buena práctica
+import { asyncMiddleware } from './middlewares/async';
+import { reducer } from "./features/todos";
 
 //EJEMPLO DE CÓMO CREAR UN REDUCER SIMPLE:
 
