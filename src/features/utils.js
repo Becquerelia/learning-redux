@@ -57,7 +57,14 @@ const makeCrudReducer =
     }
   };
 
-//! MAKE ACTION CREATOR (MAC)
+//! MAKE ASYNC TYPES (MAT):
+const mat = (entity) => [
+  `${entity}/pending`,
+  `${entity}/fulfilled`,
+  `${entity}/rejected`,
+];
+
+//! MAKE ACTION CREATOR (MAC):
 const mac =
   (type, ...argNames) =>
   (...args) => {
@@ -68,10 +75,19 @@ const mac =
     return action;
   };
 
+//! ASYNC MAC FUNCTION:
+const asyncMac = (asyncTypes) => [
+  mac(asyncTypes[0]),
+  mac(asyncTypes[1], "payload"),
+  mac(asyncTypes[2], "error"),
+];
+
 export {
   makeFetchingReducer,
   makeSetReducer,
   reduceReducers,
   makeCrudReducer,
   mac,
+  mat,
+  asyncMac,
 };

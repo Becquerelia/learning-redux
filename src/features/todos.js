@@ -1,23 +1,19 @@
 import { combineReducers } from "redux";
-import { mac, makeFetchingReducer, makeSetReducer, reduceReducers, makeCrudReducer } from "./utils";
+import { mac, mat, asyncMac, makeFetchingReducer, makeSetReducer, reduceReducers, makeCrudReducer } from "./utils";
 
 //! SET FULFILLED & MAKE ACTION CREATOR (MAC):
 const sf = mac("todos/fulfilled", "payload")
 
-//! "SET PENDING" FUNCTION:
-const setPending = mac("todos/pending");    
-  
-  //! "SET FULLFILED" FUNCTION:
-  const setFullfilled = mac("todos/fulfilled", "payload"); 
+ //! ASYNC TODOS FUNCTION:
+ const asyncTodos = mat("todos");
+ 
+ const [ setPending, setFullfilled, setError ] = asyncMac(asyncTodos);
     
-  //! "SET ERROR" FUNCTION:
-  const setError = mac("todos/error", "error");
+ //! "SET COMPLETE" FUNCTION:
+ const setComplete = mac("todo/complete", "payload");
     
-  //! "SET COMPLETE" FUNCTION:
-  const setComplete = mac("todo/complete", "payload");
-    
-  //! "SET FILTER" FUNCTION:
-  const setFilter = mac("filter/set", "payload");
+ //! "SET FILTER" FUNCTION:
+ const setFilter = mac("filter/set", "payload");
  
  //! FUNCTION FOR GET DATA WITH FETCHING:
   const fetchThunk = () => async dispatch => {
@@ -37,7 +33,7 @@ const setPending = mac("todos/pending");
 const filterReducer = makeSetReducer(["filter/set"]);
   
 //! FETCHING REDUCER:
- const fetchingReducer = makeFetchingReducer(["todos/pending", "todos/fulfilled", "todos/rejected"]);
+ const fetchingReducer = makeFetchingReducer(asyncTodos);
 
  //! FULFILLED REDUCER:
  const fulfilledReducer = makeSetReducer(["todos/fulfilled"]);
