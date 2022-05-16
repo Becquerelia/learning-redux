@@ -1,45 +1,24 @@
 import { combineReducers } from "redux";
-import { makeFetchingReducer, makeSetReducer, reduceReducers, makeCrudReducer } from "./utils";
+import { mac, makeFetchingReducer, makeSetReducer, reduceReducers, makeCrudReducer } from "./utils";
+
+//! SET FULFILLED & MAKE ACTION CREATOR (MAC):
+const sf = mac("todos/fulfilled", "payload")
 
 //! "SET PENDING" FUNCTION:
-const setPending = () => {
-    return {
-      type: "todos/pending"
-    }
-  }
+const setPending = mac("todos/pending");    
   
   //! "SET FULLFILED" FUNCTION:
-  const setFullfilled = (todos) => {
-    return {
-      type: "todos/fulfilled", 
-      payload: todos
-    }
-  }
-  
+  const setFullfilled = mac("todos/fulfilled", "payload"); 
+    
   //! "SET ERROR" FUNCTION:
-  const setError = (e) => {
-    return {
-      type: "todos/error", 
-      error: e.message
-    }
-  }
-  
+  const setError = mac("todos/error", "error");
+    
   //! "SET COMPLETE" FUNCTION:
-  const setComplete = (todo) => {
-    return {
-      type: "todo/complete", 
-      payload: todo
-    }
-  }
-  
+  const setComplete = mac("todo/complete", "payload");
+    
   //! "SET FILTER" FUNCTION:
-  const setFilter = (payload) => {
-    return {
-      type: "filter/set", 
-      payload
-    }
-  }
-
+  const setFilter = mac("filter/set", "payload");
+ 
  //! FUNCTION FOR GET DATA WITH FETCHING:
   const fetchThunk = () => async dispatch => {
   dispatch (setPending());
@@ -50,7 +29,7 @@ const setPending = () => {
     dispatch(setFullfilled(todos))    
   }
   catch (e) {
-    dispatch (setError(e));
+    dispatch (setError(e.message));
   }
 }
 
